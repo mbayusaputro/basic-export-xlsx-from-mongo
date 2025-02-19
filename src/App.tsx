@@ -13,6 +13,7 @@ function App() {
   });
 
   const exportToExcel = (data: any[] = []) => {
+    const name = count === 0 ? "summary" : "chat_histories";
     if (data.length === 0) {
       alert('No data to export');
       return;
@@ -21,7 +22,7 @@ function App() {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
-    XLSX.writeFile(workbook, 'exported_data.xlsx');
+    XLSX.writeFile(workbook, `${name}_${Date.now()}.xlsx`);
   };
 
   return (
