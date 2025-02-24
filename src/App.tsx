@@ -3,6 +3,7 @@ import * as XLSX from 'xlsx';
 
 import './App.css';
 import { getMongo } from './utils/mongo';
+import { hexToUtf8, markdownToPlainText } from './utils/helper';
 
 function App() {
   const [company, setCompany] = useState('');
@@ -19,7 +20,20 @@ function App() {
       return;
     }
 
-    const worksheet = XLSX.utils.json_to_sheet(data);
+    let arr: any[] = [];
+    if (count === 1) {
+      for (const item of data) {
+        const Answer = markdownToPlainText(hexToUtf8(item.Answer));
+        arr.push({
+          ...item,
+          Created: new Date(item.Created).toString(),
+          Question: item.Question,
+          Answer,
+        })
+      }
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(arr.length > 0 ? arr : data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
     XLSX.writeFile(workbook, `${name}_${Date.now()}.xlsx`);
