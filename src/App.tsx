@@ -1,42 +1,96 @@
-import { useState } from 'react';
-import * as XLSX from 'xlsx';
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+import { useState } from "react";
+import * as XLSX from "xlsx";
 
-import './App.css';
-import { getMongo } from './utils/mongo';
-import { hexToUtf8, markdownToPlainText } from './utils/helper';
+import "./App.css";
+import { getMongo } from "./utils/mongo";
+import { hexToUtf8, markdownToPlainText } from "./utils/helper";
+
+interface IItem {
+  name: string;
+  data: any[];
+}
 
 function App() {
-  const [company, setCompany] = useState('');
-  const [count, setCount] = useState(0);
+  const [keydb, setKeydb] = useState("");
+  const [company, setCompany] = useState("");
+  const [count, setCount] = useState(2);
   const [date, setDate] = useState({
     start: new Date().toISOString(),
     end: new Date().toISOString(),
   });
 
+  const customArr: (data: any[]) => any[] = (data: any[] = []) => {
+    const arr: any[] = [];
+    for (const item of data) {
+      const Answer = markdownToPlainText(hexToUtf8(item.Answer));
+      arr.push({
+        ...item,
+        Created: new Date(item.Created).toString(),
+        Question: item.Question,
+        Answer,
+      });
+    }
+    return arr;
+  };
+
+  const exportAll = (data: IItem[] = []) => {
+    console.log(data);
+    const workbook = XLSX.utils.book_new();
+    for (const item of data) {
+      let arr: any[] = item.data;
+      if (item.name !== "Summary") {
+        arr = customArr(item.data);
+      }
+      const worksheet = XLSX.utils.json_to_sheet(arr);
+      XLSX.utils.book_append_sheet(workbook, worksheet, item.name);
+    }
+    XLSX.writeFile(workbook, `${Date.now()}.xlsx`);
+  };
+
   const exportToExcel = (data: any[] = []) => {
-    const name = count === 0 ? "summary" : "chat_histories";
+    const name = count === 0 ? "Summary" : "Chat Histories";
     if (data.length === 0) {
-      alert('No data to export');
+      alert("No data to export");
       return;
     }
 
-    let arr: any[] = [];
-    if (count === 1) {
-      for (const item of data) {
-        const Answer = markdownToPlainText(hexToUtf8(item.Answer));
-        arr.push({
-          ...item,
-          Created: new Date(item.Created).toString(),
-          Question: item.Question,
-          Answer,
-        })
-      }
-    }
-
-    const worksheet = XLSX.utils.json_to_sheet(arr.length > 0 ? arr : data);
+    const worksheet = XLSX.utils.json_to_sheet(
+      count === 1 ? customArr(data) : data,
+    );
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
+    XLSX.utils.book_append_sheet(workbook, worksheet, name);
     XLSX.writeFile(workbook, `${name}_${Date.now()}.xlsx`);
+  };
+
+  const onExport = async () => {
+    if (count === 2) {
+      const request = {
+        keydb,
+        companyId: company,
+        ...date,
+      };
+      const resp0 = await getMongo({
+        type: 0,
+        ...request,
+      });
+      const resp1 = await getMongo({
+        type: 1,
+        ...request,
+      });
+      exportAll([
+        { name: "Summary", data: resp0 },
+        { name: "Chat Histories", data: resp1 },
+      ]);
+    } else {
+      const resp = await getMongo({
+        type: count,
+        keydb,
+        companyId: company,
+        ...date,
+      });
+      exportToExcel(resp);
+    }
   };
 
   return (
@@ -55,6 +109,15 @@ function App() {
       </div>
       <h1>Mongo + Excel</h1>
       <div className="card">
+        <div>
+          <label htmlFor="company">Key DB: </label>
+          <input
+            type="text"
+            id="keydb"
+            value={keydb}
+            onChange={(e) => setKeydb(e.target.value)}
+          />
+        </div>
         <div>
           <label htmlFor="company">Company ID: </label>
           <input
@@ -91,8 +154,8 @@ function App() {
         </div>
         <div
           style={{
-            display: 'flex',
-            flexDirection: 'column',
+            display: "flex",
+            flexDirection: "column",
           }}
         >
           <div>
@@ -115,19 +178,18 @@ function App() {
             />
             <label htmlFor="chat"> Chat Histories (Sheet 2)</label>
           </div>
+          <div>
+            <input
+              type="checkbox"
+              id="all"
+              value={2}
+              checked={count === 2}
+              onChange={() => setCount(2)}
+            />
+            <label htmlFor="all"> Summary & Chat Histories</label>
+          </div>
         </div>
-        <button
-          onClick={async () => {
-            const resp = await getMongo({
-              type: count,
-              companyId: company,
-              ...date,
-            });
-            exportToExcel(resp);
-          }}
-        >
-          Export
-        </button>
+        <button onClick={onExport}>Export</button>
       </div>
       <p className="read-the-docs">Made by Ryuguji</p>
     </>
