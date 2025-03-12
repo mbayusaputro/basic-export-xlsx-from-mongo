@@ -12,7 +12,7 @@ interface IPayload {
 export async function getMongo(payload: IPayload): Promise<any> {
   try {
     const response = await axios.post(
-      "http://localhost:5000/api/data",
+      "https://mongo-example-gamma.vercel.app/api/data",
       payload,
     );
     return Promise.resolve(response.data);
