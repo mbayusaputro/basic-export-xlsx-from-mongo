@@ -36,11 +36,124 @@
   }
 } */
 
+/* General Card Style */
 .card {
-  padding: 2em;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Input Group */
+.input-group,
+.date-range-group,
+.checkbox-group,
+.dropdown-group {
+  margin-bottom: 20px;
+  width: 100%;
+  column-gap: 20px;
+}
+
+/* Labels */
+.input-label,
+.checkbox-label,
+.dropdown-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+/* Input Fields */
+.input-field,
+.dropdown-field {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+.input-field:focus,
+.dropdown-field:focus {
+  border-color: #007BFF;
+  outline: none;
+}
+
+/* Checkbox Styling */
+.checkbox-item {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-input {
+  margin-right: 10px;
+}
+
+/* Checkbox Label */
+.checkbox-label {
+  font-size: 14px;
+  color: #333;
+}
+
+/* Dropdown Styling */
+.dropdown-group {
+  margin-bottom: 20px;
+}
+
+.dropdown-field {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.dropdown-field:focus {
+  border-color: #007BFF;
+  outline: none;
+}
+
+/* Button Styling */
+.export-button {
+  /* background-color: #007BFF; */
+  color: #fff;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.export-button:hover {
+  background-color: #0056b3;
+}
+
+.export-button:active {
+  background-color: #003f7f;
+}
+
+.date-range-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wrapper {
   display: flex;
   flex-direction: column;
-  row-gap: 20px;
+  justify-content: center;
+  align-items: center;
+  width: 600px;
 }
 
 .read-the-docs {

@@ -1,6 +1,8 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 import axios from "axios";
 
+const apiUrl = import.meta.env.VITE_API_URL ?? '';
+
 interface IPayload {
   start: string;
   end: string;
@@ -9,11 +11,22 @@ interface IPayload {
   keydb: string;
 }
 
-export async function getMongo(payload: IPayload): Promise<any> {
+export async function getData(payload: IPayload): Promise<any> {
   try {
     const response = await axios.post(
-      "https://mongo-example-gamma.vercel.app/api/data",
+      apiUrl + '/api/data',
       payload,
+    );
+    return Promise.resolve(response.data);
+  } catch (e) {
+    return Promise.reject(e);
+  }
+}
+
+export async function getCompanies(): Promise<any> {
+  try {
+    const response = await axios.get(
+      apiUrl + '/api/companies'
     );
     return Promise.resolve(response.data);
   } catch (e) {
